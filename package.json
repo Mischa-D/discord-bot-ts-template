@@ -1,0 +1,19 @@
+{
+  "name": "discord_bot_template",
+  "version": "1.0.0",
+  "description": "",
+  "module": "src",
+  "scripts": {
+    "start": "tsx src/scripts/start-client.ts",
+    "register": "tsx src/scripts/deploy-commands.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^14.7.1",
+    "dotenv": "^16.0.3",
+    "ts-node": "^10.9.1",
+    "tsx": "^4.19.3"
+  }
+}
