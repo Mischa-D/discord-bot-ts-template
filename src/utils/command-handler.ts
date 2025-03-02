@@ -20,8 +20,8 @@ const hasGuildId = <T extends object>(
 };
 
 export const handler = (client: Client) => {
+  // load command files from commands folder
   const commands = new Collection<string, ICommand>();
-
   const commandFiles = getFiles(COMMANDS_FOLDER);
   console.log(commandFiles);
 
@@ -34,18 +34,23 @@ export const handler = (client: Client) => {
 
   client.on("interactionCreate", async (interaction) => {
     try {
+      // only handle interactions that are a slash command or autocomplete with a guildId (server id)
       if (!interaction.isChatInputCommand() && !interaction.isAutocomplete())
         return;
       if (!hasGuildId(interaction)) return;
 
       const command = commands.get(interaction.commandName);
 
+      // handle autocomplete interactions
       if (interaction.isAutocomplete()) {
+        // overwrite possibly existing interaction in storage
+        // autocomplete should only respond to the latest sent interaction
         autocompleteInteractionCollection.set(interaction.guildId, interaction);
         await command?.autocomplete?.(interaction);
         return;
       }
 
+      // handle slash command
       if (!command)
         throw new CustomError("Could not find the requested command");
 
@@ -63,7 +68,6 @@ export const handler = (client: Client) => {
       if (error instanceof CustomError) {
         userMessage = error.message;
       }
-
       try {
         await replyEphemeral(interaction, userMessage);
       } catch (error) {

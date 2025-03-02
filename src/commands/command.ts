@@ -28,7 +28,10 @@ const command: ICommand = {
         .setAutocomplete(true)
     ),
   async execute(interaction) {
+    // setting (required) true will mean the value is guaranteed to be string
     const option1 = interaction.options.getString("option1", true);
+
+    // otherwise it might be undefined instead. set accordingly to setRequired() in the slashcommandbuilder
     const discordUser = interaction.options.getUser("DiscordUser");
 
     // output
@@ -42,19 +45,26 @@ const command: ICommand = {
     embed.addFields({ name: "an empty field", value: "\u200B" });
     embed.addFields({ name: "use option value", value: `${discordUser}` });
 
+    // make sure to await here, or error handling might fail and crash the bot
     await interaction.reply({ embeds: [embed] });
   },
+  // this is optional if your command does not use autocomplete
   async autocomplete(interaction) {
     const autoCompleteContext = interaction.options.getFocused(true);
     const userTypedThisValue = autoCompleteContext.value;
     const nameOfTheOption = autoCompleteContext.name;
 
+    // dynamically generate choices
+    // autocomplete choices are not enforced, for a static, enforced set of choices use .setChoices()
     const choices = searchAvailableValues(userTypedThisValue);
 
+    // respond only to the latest sent interaction
     const latestInteraction = autocompleteInteractionCollection.get(
       interaction.guildId
     );
     if (!latestInteraction) return;
+
+    // make sure to await here, or error handling might fail and crash the bot
     await latestInteraction.respond(
       choices.map((choice) => {
         return {
@@ -63,10 +73,13 @@ const command: ICommand = {
         };
       })
     );
+
+    // delete interaction from storage to signal that it has been handled
     autocompleteInteractionCollection.set(interaction.guildId, null);
   },
 };
 
+// this could also be a function that queries a database / data file
 const searchAvailableValues = (value: string) => {
   return ["Apple", "Banana", "Orange"].filter((fruit) => fruit.includes(value));
 };
