@@ -1,6 +1,6 @@
 import { EmbedBuilder } from "discord.js";
 
-export const createEmbedTemplate = () => {
+export const createEmbedTemplate = async () => {
   const embed = new EmbedBuilder()
     .setColor("#3837b9")
     .setTimestamp()
